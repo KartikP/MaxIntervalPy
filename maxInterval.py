@@ -1,6 +1,7 @@
 import numpy as np
 
 
+
 def maxInterval(spiketrain, max_begin_ISI=0.17, max_end_ISI=0.3, min_IBI=0.2, min_burst_duration=0.01,
                 min_spikes_in_burst=3):
     allBurstData = {}
@@ -49,15 +50,18 @@ def maxInterval(spiketrain, max_begin_ISI=0.17, max_end_ISI=0.3, min_IBI=0.2, mi
     we then merge the bursts. We specifically need to check when say three
     bursts are merged into one.
     '''
-    tmp = allBurstData
+    tmp = allBurstData.copy()
     allBurstData = {}
     burstNum = 0
-    for b in range(1, len(tmp)):
+    b = 1
+    while b < len(tmp):
         prevBurst = tmp[b - 1]
         currBurst = tmp[b]
-        if IBI[b - 1] < min_IBI:
+        if IBI[b - 1] <= min_IBI:
             prevBurst = np.append(prevBurst, currBurst)
+            b += 1
         allBurstData[burstNum] = prevBurst
+        b+=1
         burstNum += 1
     if burstNum >= 2:
         allBurstData[burstNum] = currBurst
@@ -82,7 +86,6 @@ def maxInterval(spiketrain, max_begin_ISI=0.17, max_end_ISI=0.3, min_IBI=0.2, mi
             else:
                 allBurstData[burstNum] = currBurst
                 burstNum += 1
-
     '''
     plt.figure()
     plt.eventplot(spiketrain)
@@ -91,7 +94,4 @@ def maxInterval(spiketrain, max_begin_ISI=0.17, max_end_ISI=0.3, min_IBI=0.2, mi
         plt.axvline(burst[0], color='green')
         plt.axvline(burst[-1], color='red')
     '''
-
     return allBurstData, tooShort
-
-
